@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Origin Trial Token -->
+    <meta http-equiv="origin-trial"
+          content="AkK15PCT/JQzZOG2MuAyNPO4fR1U0rtIhLAogFay1cDTMLL2ulyBPKWiTiGdPa5FIzAHDC2yC+7mF/YBe+tI0g8AAABaeyJvcmlnaW4iOiAiaHR0cHM6Ly92ZW5zaS5naXRodWIuaW86NDQzIiwgImZlYXR1cmUiOiAiV2ViQmx1ZXRvb3RoIiwgImV4cGlyeSI6IDE0NzMyNjQ4NDV9"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sensor Fusion</title>
+    <!-- build:css -->
+    <!-- endbuild -->
+    <!-- Loading core css-->
+    <!-- build:js -->
+    <!-- endbuild -->
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <!-- build:css({.tmp/serve,src}) styles/vendor.css -->
+    <!-- bower:css -->
+    <!-- run `gulp inject` to automatically populate bower styles dependencies -->
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:css({.tmp/serve,src}) styles/app.css -->
+    <!-- inject:css -->
+    <!-- css files will be automatically insert here -->
+    <!-- endinject -->
+    <!-- endbuild -->
+</head>
+<!-- build:js(src) scripts/vendor.js -->
+<!-- bower:js -->
+<!-- run `gulp inject` to automatically populate bower script dependencies -->
+<!-- endbower -->
+<!-- endbuild -->
+<!-- build:js({.tmp/serve,.tmp/partials,src}) scripts/app.js -->
+<!-- inject:js -->
+<!-- js files will be automatically insert here -->
+<!-- endinject -->
+<!-- inject:partials -->
+<!-- angular templates will be automatically converted in js and inserted here -->
+<!-- endinject -->
+<!-- endbuild -->
+
+<body ng-app="sensorFusion" class="thing">
+
+<div ng-controller="mainController as main" md-theme-watch="true">
+
+    <!--<div id="toaster"></div>-->
+    <div class="row heading" flex="100" layout="row" layout-align="center center">
+        <div flex="100" style="text-align: center; color: white; font-size: 22px">SensorTile Super Ball</div>
+        <div style="position:absolute; right: 0; padding-right: 0; width: 40px; cursor: pointer" ng-show="!sensorFusion.connected" ng-click="onConnect()">
+            <i class="fa fa-bluetooth-b fa-2x" style="color: white" aria-hidden="true"></i>
+        </div>
+        <!--<div class="dialog-demo-content" style="position: absolute; left: 0px; width: 62px;">-->
+            <!--<md-button class="md-icon-button md-primary" aria-label="Settings"> Settings-->
+                <!--&lt;!&ndash;<md-icon md-svg-icon="images/settings.svg" style="color: #3e3737;"></md-icon>&ndash;&gt;-->
+            <!--</md-button>-->
+        <!--</div>-->
+        <!--<div class="logo" style="margin-top: 6px;"></div>-->
+        <!--&lt;!&ndash; <div layout="column" flex="80" class="heading-text" style="padding-left: 7px;">{{terminal.deviceName}}</div> &ndash;&gt;-->
+
+        <!--<div layout="column" flex="20" layout-align="center end"-->
+             <!--style="position: absolute; right: 0px; width: 62px; margin-top: -3px; border: solid red">-->
+            <!--&lt;!&ndash;<md-button style="text-transform: capitalize !important; color: white;" ng-click="onConnect()">&ndash;&gt;-->
+                <!--&lt;!&ndash;Connect&ndash;&gt;-->
+            <!--&lt;!&ndash;</md-button>&ndash;&gt;-->
+            <!--<i class="fa fa-bluetooth-b" style="color: white" aria-hidden="true"></i>-->
+        <!--</div>-->
+        <!--<div layout="column" flex="20" layout-align="center end"-->
+             <!--style="position: absolute; right: 0px; width: 62px; margin-top: -3px;"-->
+             <!--ng-show="terminal.connected && isApp">-->
+            <!--<md-button style="text-transform: capitalize !important; color: white;" ng-click="onDisconnect()">-->
+                <!--Disconnect-->
+            <!--</md-button>-->
+        <!--</div>-->
+    </div>
+    <div layout="row" layout-wrap ng-show="sensorFusion.connected">
+        <div flex="100" flex-gt-xs="100">
+            <div layout="row" class="p-10-ball" style="position: relative" layout-align="center center" layout-wrap flex="100">
+                <!--<div layout="row" class="p-10 img-container" style="position: relative;vertical-align: middle !important;margin-left: auto;margin-right: auto;display: table;" flex="100" layout-align="center center">-->
+                <div flex="100" id="canvas" layout="row">
+                    <div ng-show="(!objectLoaded || !sensorFusion.connected || sensorFusion.q00 == undefined) && !sensorFusion.disconnected" style="position: absolute; left: 50%; top: 48%; margin-left: -40px">Loading...</div>
+                    <div id="noiseImg" layout="row" layout-align="left left" ng-show="sensorFusion.readyToDisplay">
+                        <div style="margin-top:8%; text-align: right; width: 60px; font-weight: bolder" ng-show="sensorFusion.data.micData != 0"> &nbsp;{{ sensorFusion.data.micData }}&nbsp; dB &nbsp;</div>
+                        <div id="noiseCircle" class="circle-icon-img" layout="row" layout-align="center center">
+                            <md-icon md-svg-src="{{ speaker }}"></md-icon>
+                        </div>
+                    </div>
+                    <div id="tempImg" layout="row" layout-align="left left" ng-show="sensorFusion.readyToDisplay">
+                        <div id="tempCircle" class="circle-icon-img red-b-c" layout="row" layout-align="center center">
+                            <md-icon md-svg-src="app/images/thermometer.svg"></md-icon>
+                        </div>
+                        <h4 ng-hide="sensorFusion.data.envData.temperature == undefined" style="margin-top:8%"> &nbsp;{{
+                            sensorFusion.data.envData.temperature }} &deg;F</h4>
+                    </div>
+                    <div id="pressImg" layout="row" layout-align="left left" ng-show="sensorFusion.readyToDisplay">
+                        <div id="pressCircle" class="circle-icon-img green-b-c" layout="row" layout-align="center center">
+                            <md-icon md-svg-src="app/images/press.svg"></md-icon>
+                        </div>
+                        <h4 ng-hide="sensorFusion.data.envData.pressure == undefined" style="margin-top:8%"> &nbsp;{{
+                            sensorFusion.data.envData.pressure }} mbar</h4>
+                    </div>
+                    <div id="battImg" layout="row" layout-align="left left" ng-show="sensorFusion.batteryLevel != undefined && sensorFusion.readyToDisplay" style=" font-size: 15px;position:absolute;top:85%;left:48%;width: 110px;height: 50px;">
+                        <div id="battCircle" class="circle-icon-img" layout="row" layout-align="center center">
+                            <!--<ng-md-icon ng-if="sensorFusion.batteryLevel<=85 && sensorFusion.batteryLevel>35" icon="battery_50" style="fill: white" size="..."></ng-md-icon>-->
+
+                            <ng-md-icon ng-if="sensorFusion.batteryLevel == undefined" icon="battery_unknown" style="fill: white" size="..."></ng-md-icon>
+                            <ng-md-icon ng-if="sensorFusion.batteryLevel>95" icon="battery_full" style="fill: white" size="..."></ng-md-icon>
+                            <ng-md-icon ng-if="sensorFusion.batteryLevel<=95 && sensorFusion.batteryLevel>85" icon="battery_90" style="fill: white" size="..."></ng-md-icon>
+                            <ng-md-icon ng-if="sensorFusion.batteryLevel<=85 && sensorFusion.batteryLevel>75" icon="battery_80" style="fill: white" size="..."></ng-md-icon>
+                            <ng-md-icon ng-if="sensorFusion.batteryLevel<=75 && sensorFusion.batteryLevel>55" icon="battery_60" style="fill: white" size="..."></ng-md-icon>
+                            <ng-md-icon ng-if="sensorFusion.batteryLevel<=55 && sensorFusion.batteryLevel>35" icon="battery_50" style="fill: white" size="..."></ng-md-icon>
+                            <ng-md-icon ng-if="sensorFusion.batteryLevel<=35 && sensorFusion.batteryLevel>25" icon="battery_30" style="fill: white" size="..."></ng-md-icon>
+                            <ng-md-icon ng-if="sensorFusion.batteryLevel<=25 && sensorFusion.batteryLevel>15" icon="battery_20" style="fill: white" size="..."></ng-md-icon>
+                            <ng-md-icon ng-if="sensorFusion.batteryLevel<=15" icon="battery_alert" style="fill: white" size="..."></ng-md-icon>
+
+                        </div>
+                        <h4 ng-hide="sensorFusion.data.envData.pressure == undefined" style="margin-top:8%"> &nbsp;{{
+                            sensorFusion.batteryLevel }} %</h4>
+                    </div>
+
+                    <div id="agmImage" layout="row" layout-align="left left" ng-show="sensorFusion.readyToDisplay">
+                        <h4 style="margin-top:10%"> &nbsp;{{ sensorFusion.data.accGyroMag.motionStatus }}&nbsp;</h4>
+                        <div id="agmCircle" class="circle-icon-img green-b-c" layout="row" layout-align="center center">
+                            <md-icon md-svg-src="app/images/power.svg"></md-icon>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div flex="100" flex-gt-xs="100" ng-show="sensorFusion.readyToDisplay">
+
+            <div class="white-box p-10" layout="row" layout-wrap>
+                <button class="accordion">
+                    <div layout="row" layout-align="start center" flex="100" layout-wrap>
+                        <div id='noiseIcon' class="circle-icon" layout="row" layout-align="center center">
+                            <md-icon md-svg-src="{{ speaker }}"></md-icon>
+                        </div>
+                        <h3 ng-show="sensorFusion.data.micData != 0" class="pl-10" id="noiseLevel">{{ sensorFusion.data.micData }} &nbsp;dB</h3>
+                    </div>
+                </button>
+                <div class="panel" layout="row" flex="100">
+                    <div layout="row" flex="100" layout-wrap>
+                    <nvd3 options="options" data="graphData.micGraph"></nvd3>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="tempDiv white-box p-10">
+                <button class="accordion">
+                    <div layout="row" layout-align="start center" class="pb-10" style="padding: 0">
+                        <div id='envIcon' class="circle-icon red-b-c" layout="row" layout-align="center center">
+                            <md-icon md-svg-src="app/images/thermometer.svg"></md-icon>
+                        </div>
+                        <h3 id="temperatureLevel" class="pl-10"
+                            ng-hide="sensorFusion.data.envData.temperature == undefined">{{ sensorFusion.data.envData.temperature }} &deg;F</h3>
+                    </div>
+                </button>
+                <div class="panel" layout="row" flex="100">
+                    <div layout="row" flex="100" layout-align="center start" layout-wrap>
+                        <nvd3 options="options" data="graphData.tempGraph"></nvd3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="white-box p-10" layout="row" layout-wrap>
+                <button class="accordion">
+                    <div layout="row" layout-align="start center" class="pb-10" style="padding: 0;" flex="60"
+                         layout-wrap>
+                        <div id='agmIcon' class="circle-icon green-b-c" layout="row" layout-align="center center">
+                            <md-icon md-svg-src="app/images/power.svg"></md-icon>
+                        </div>
+                        <h3 class="pl-10" id="motionStatus" layout="row" layout-align="center center">{{
+                            sensorFusion.data.accGyroMag.motionStatus }} </h3>
+                    </div>
+                </button>
+                <div class="panel" layout="row" flex="100">
+                    <div layout="row" flex="100" layout-wrap style="margin-top: 10px">
+                        <button class="accordion inner-accordion">
+                            <h3 >Acc </h3>
+                        </button>
+                        <div class="panel" layout="row" flex="100">
+                            <div flex="100" layout="column" layout-align="center center">
+                                <nvd3 options="options" data="graphData.accGraph"></nvd3>
+                            </div>
+                        </div>
+                        <button class="accordion inner-accordion">
+                            <h3 >Gyro </h3>
+                        </button>
+                        <div class="panel" layout="row" flex="100">
+                            <div flex="100" layout="column" layout-align="center center">
+                                <h3>Gyroscope</h3>
+                                <nvd3 options="options" data="graphData.gyroGraph"></nvd3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel" layout="row" flex="100">
+                    <div layout="row" flex="100" layout-wrap>
+                        <div style="margin-right: 10px; margin-top:10px" flex="20">
+                            <md-input-container class="md-icon-float md-icon-right md-block"  style="padding-right: 0; margin-top: 10px; width: 120px">
+                                <label>Moving</label>
+                                <input ng-model="sensorFusion.motionFirstTrigger" type="number" step="0.01">
+                            </md-input-container>
+                        </div>
+                        <div style="margin-right: 10px; margin-top:10px" flex="20">
+                            <md-input-container class="md-icon-float md-icon-right md-block"  style="padding-right: 0; margin-top: 10px; width: 120px">
+                                <label>Fall</label>
+                                <input ng-model="sensorFusion.motionSecondTrigger" type="number" step="0.01">
+                            </md-input-container>
+                        </div>
+                        <div layout="row" flex="50" layout-align="end center" style="margin-top: 10px">
+                            <md-switch ng-model="motionAlarmOn" aria-label="Alarm ON" layout="row" layout-align="end center"
+                                       flex-gt-lg="35" style=" max-height: 0px;     margin-bottom: 25px;"> Alarm
+                            </md-switch>
+                        </div>
+                        <button class="accordion inner-accordion">
+                            <h3 >Acc </h3>
+                        </button>
+                        <div class="panel" layout="row" flex="100">
+                            <div flex="100" layout="column" layout-align="center center">
+                                <nvd3 options="options" data="graphData.accGraph"></nvd3>
+                            </div>
+                        </div>
+                        <button class="accordion inner-accordion">
+                            <h3 >Gyro </h3>
+                        </button>
+                        <div class="panel" layout="row" flex="100">
+                            <div flex="100" layout="column" layout-align="center center">
+                                <h3>Gyroscope</h3>
+                                <nvd3 options="options" data="graphData.gyroGraph"></nvd3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tempDiv white-box p-10" ng-show="sensorFusion.batteryLevel != undefined">
+                <button class="accordionBatt" style="background-color:  rgba(238, 238, 238, 0); color: #444; cursor: pointer; width: 100%; text-align: left; border: none; outline: none; position: relative; ">
+                    <div layout="row" layout-align="start center" class="pb-10" style="padding: 0">
+                        <div id="battIcon" class="circle-icon" layout="row" layout-align="center center">
+                            <ng-md-icon ng-if="sensorFusion.batteryLevel == undefined" icon="battery_unknown" style="fill: white" size="..."></ng-md-icon>
+                            <ng-md-icon ng-if="sensorFusion.batteryLevel>95" icon="battery_full" style="fill: white" size="..."></ng-md-icon>
+                            <ng-md-icon ng-if="sensorFusion.batteryLevel<=95 && sensorFusion.batteryLevel>85" icon="battery_90" style="fill: white" size="..."></ng-md-icon>
+                            <ng-md-icon ng-if="sensorFusion.batteryLevel<=85 && sensorFusion.batteryLevel>75" icon="battery_80" style="fill: white" size="..."></ng-md-icon>
+                            <ng-md-icon ng-if="sensorFusion.batteryLevel<=75 && sensorFusion.batteryLevel>55" icon="battery_60" style="fill: white" size="..."></ng-md-icon>
+                            <ng-md-icon ng-if="sensorFusion.batteryLevel<=55 && sensorFusion.batteryLevel>35" icon="battery_50" style="fill: white" size="..."></ng-md-icon>
+                            <ng-md-icon ng-if="sensorFusion.batteryLevel<=35 && sensorFusion.batteryLevel>25" icon="battery_30" style="fill: white" size="..."></ng-md-icon>
+                            <ng-md-icon ng-if="sensorFusion.batteryLevel<=25 && sensorFusion.batteryLevel>15" icon="battery_20" style="fill: white" size="..."></ng-md-icon>
+                            <ng-md-icon ng-if="sensorFusion.batteryLevel<=15" icon="battery_alert" style="fill: white" size="..."></ng-md-icon>
+                        </div>
+                        <h3 class="pl-10" ng-hide="sensorFusion.batteryLevel == undefined">{{ sensorFusion.batteryLevel }} &nbsp;%</h3>
+                    </div>
+                </button>
+                <div class="panel" layout="row" flex="100">
+                    <div layout="row" flex="100" layout-align="center start" layout-wrap>
+                        <nvd3 options="options" data="graphData.tempGraph"></nvd3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--<md-button class="md-raised md-primary" ng-click="connection()">Connect</md-button>-->
+
+</div>
+<!--<div class="btn" ng-click="connection()">Connect</div>-->
+</body>
+
+</html>

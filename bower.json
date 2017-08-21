@@ -1,0 +1,17 @@
+{
+  "name": "SensorTile",
+  "version": "1.0.0",
+  "dependencies": {
+    "angular": "1.6.6",
+    "angular-material": "^1.1.1",
+    "angular-ui-router": "^0.3.1",
+    "angular-material-icons": "0.7.1",
+    "blueapp.io": "latest",
+    "text-encoding": "^0.6.1",
+    "angular-nvd3": "latest",
+    "font-awesome-bower": "4.7.0"
+  },
+  "resolutions": {
+    "angular": "1.6.6"
+  }
+}
